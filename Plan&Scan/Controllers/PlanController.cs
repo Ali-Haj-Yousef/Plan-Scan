@@ -330,6 +330,7 @@ namespace Plan_Scan.Controllers
                     text = x.Date
                 })
                 .Distinct()
+                .OrderBy(x => x.value)
                 .ToList();
 
             return Json(options);
@@ -368,6 +369,7 @@ namespace Plan_Scan.Controllers
                     text = x.Date
                 })
                 .Distinct()
+                .OrderBy(x => x.value)
                 .ToList();
 
             return Json(options);
@@ -562,7 +564,12 @@ namespace Plan_Scan.Controllers
                                                                                                           reg.Course == course &&
                                                                                                           reg.Room == room && 
                                                                                                           reg.Lang == lang)
-                                                                                            .OrderBy(r => r.SeatNb)
+                                                                                            .ToList()
+                                                                                            .OrderBy(r =>
+                                                                                            {
+                                                                                                int seatNumber;
+                                                                                                return int.TryParse(r.SeatNb, out seatNumber) ? seatNumber : int.MaxValue; // Place invalid entries at the end
+                                                                                            })
                                                                                             .ToList();
                                             int regNb = registrations.Count();
 

@@ -73,8 +73,12 @@
                                 $endDateList.append($('<option></option>').val('').text('NULL'));
 
                                 $.each(data, function (i, option) {
-                                    $startDateList.append($('<option></option>').val(option.value).text(option.text));
-                                    $endDateList.append($('<option></option>').val(option.value).text(option.text));
+                                    // Assuming option.value is in the format 'yyyy-mm-dd'
+                                    const dateParts = option.value.split('-'); // Split the date string
+                                    const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Convert to dd/mm/yyyy
+
+                                    $startDateList.append($('<option></option>').val(option.value).text(formattedDate));
+                                    $endDateList.append($('<option></option>').val(option.value).text(formattedDate));
                                 });
                             },
                             error: function (xhr, status, error) {
@@ -189,7 +193,10 @@
                                     $endDateList.append($('<option></option>').val('').text('NULL'));
 
                                     $.each(data, function (i, option) {
-                                        $endDateList.append($('<option></option>').val(option.value).text(option.text));
+                                        const dateParts = option.value.split('-'); // Split the date string
+                                        const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Convert to dd/mm/yyyy
+
+                                        $endDateList.append($('<option></option>').val(option.value).text(formattedDate));
                                     });
                                     if(currentEndDate == null)
                                         $endDateList.val('');
@@ -265,7 +272,11 @@
                                     $startDateList.append($('<option></option>').val('').text('NULL'));
 
                                     $.each(data, function (i, option) {
-                                        $startDateList.append($('<option></option>').val(option.value).text(option.text));
+                                        // Assuming option.value is in the format 'yyyy-mm-dd'
+                                        const dateParts = option.value.split('-'); // Split the date string
+                                        const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Convert to dd/mm/yyyy
+
+                                        $startDateList.append($('<option></option>').val(option.value).text(formattedDate));
                                     });
                                     if(currentStartDate == null)
                                         $startDateList.val('');
@@ -317,7 +328,11 @@
                                         $startDateList.append($('<option></option>').val('').text('NULL'));
 
                                         $.each(data, function (i, option) {
-                                            $startDateList.append($('<option></option>').val(option.value).text(option.text));
+                                            // Assuming option.value is in the format 'yyyy-mm-dd'
+                                            const dateParts = option.value.split('-'); // Split the date string
+                                            const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Convert to dd/mm/yyyy
+
+                                            $startDateList.append($('<option></option>').val(option.value).text(formattedDate));
                                         });
                                         if(currentStartDate == null)
                                             $startDateList.val('');
@@ -341,7 +356,10 @@
                                         $endDateList.append($('<option></option>').val('').text('NULL'));
 
                                         $.each(data, function (i, option) {
-                                            $endDateList.append($('<option></option>').val(option.value).text(option.text));
+                                            const dateParts = option.value.split('-'); // Split the date string
+                                            const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Convert to dd/mm/yyyy
+
+                                            $endDateList.append($('<option></option>').val(option.value).text(formattedDate));
                                         });
                                         if(currentEndDate == null)
                                             $endDateList.val('');
@@ -392,7 +410,11 @@
                                         $startDateList.append($('<option></option>').val('').text('NULL'));
 
                                         $.each(data, function (i, option) {
-                                            $startDateList.append($('<option></option>').val(option.value).text(option.text));
+                                            // Assuming option.value is in the format 'yyyy-mm-dd'
+                                            const dateParts = option.value.split('-'); // Split the date string
+                                            const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Convert to dd/mm/yyyy
+
+                                            $startDateList.append($('<option></option>').val(option.value).text(formattedDate));
                                         });
                                         if(currentStartDate == null)
                                             $startDateList.val('');
@@ -416,7 +438,10 @@
                                         $endDateList.append($('<option></option>').val('').text('NULL'));
 
                                         $.each(data, function (i, option) {
-                                            $endDateList.append($('<option></option>').val(option.value).text(option.text));
+                                            const dateParts = option.value.split('-'); // Split the date string
+                                            const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`; // Convert to dd/mm/yyyy
+
+                                            $endDateList.append($('<option></option>').val(option.value).text(formattedDate));
                                         });
                                         if(currentEndDate == null)
                                             $endDateList.val('');
