@@ -1,0 +1,440 @@
+﻿@model PlanSheetViewModel
+<div class="d-flex justify-content-center">
+    <div class="card shadow border-0 mt-4 col-6 text-center">
+        <div class="card-header bg-info ml-0 py-3">
+            <div class="row">
+                <div class="text-center">
+                    <h2 class="text-white py-2">Plan the Sheet</h2>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <form method="post">
+                <div class="row text-start">
+                    <div class="form-floating py-2 col-6">
+                        <select id="examCodeList" asp-for="ExamCode"  class="form-select border-0 shadow">
+                            <option value="" selected>NULL</option>
+                        </select>
+                        <label asp-for="ExamCode" class="ms-2"></label>
+                        <span asp-validation-for="ExamCode" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating py-2 col-6">
+                        <select id="roomList" asp-for="Room"  class="form-select border-0 shadow">
+                            <option value="" selected>NULL</option>
+                        </select>
+                        <label asp-for="Room" class="ms-2"></label>
+                        <span asp-validation-for="Room" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row text-start">
+                    <div class="form-floating py-2 col-6">
+                        <select id="startDateList" asp-for="StartDate" class="form-select border-0 shadow">
+                            <option value="" selected>NULL</option>
+                        </select>
+                        <label asp-for="StartDate" class="ms-2"></label>
+                        <span asp-validation-for="StartDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating py-2 col-6">
+                        <select id="endDateList" asp-for="EndDate" class="form-select border-0 shadow">
+                            <option value="" selected>NULL</option>
+                        </select>
+                        <label asp-for="EndDate" class="ms-2"></label>
+                        <span asp-validation-for="EndDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">Generate PDF</button>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+                $(document).ready(function () {
+
+                    let currentExamCode = null, currentRoom = null, currentStartDate = null, currentEndDate = null;
+
+                    function loadDateOptions() {
+                        var $startDateList = $('#startDateList'); // Correct ID here
+                        var $endDateList = $('#endDateList');
+
+                        $.ajax({
+                            url: '@Url.Action("GetStartDateOptions", "Plan")',
+                            type: 'GET',
+                            data: { examCode: null, room: null, endDate: null }, // Fetch all rooms when loading
+                            success: function (data) {
+                                $startDateList.empty(); // Clear existing options
+                                $startDateList.append($('<option></option>').val('').text('NULL'));
+
+                                $endDateList.empty(); // Clear existing options
+                                $endDateList.append($('<option></option>').val('').text('NULL'));
+
+                                $.each(data, function (i, option) {
+                                    $startDateList.append($('<option></option>').val(option.value).text(option.text));
+                                    $endDateList.append($('<option></option>').val(option.value).text(option.text));
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching date options: ", error); // Log any errors
+                            }
+                        });
+                    }
+
+                    loadDateOptions();
+
+                    function loadRoomOptions() {
+                        var $roomList = $('#roomList'); // Correct ID here
+
+                        $.ajax({
+                            url: '@Url.Action("GetRoomOptions", "Plan")',
+                            type: 'GET',
+                            data: { examCode: null }, // Fetch all rooms when loading
+                            success: function (data) {
+                                $roomList.empty(); // Clear existing options
+                                $roomList.append($('<option></option>').val('').text('NULL'));
+
+                                $.each(data, function (i, option) {
+                                    $roomList.append($('<option></option>').val(option.value).text(option.text));
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching room options: ", error); // Log any errors
+                            }
+                        });
+                    }
+
+                    loadRoomOptions(); // Call the function to load room options
+
+                    function loadExamCodeOptions() {
+                        var $examCodeList = $('#examCodeList'); // Correct ID here
+
+                        $.ajax({
+                            url: '@Url.Action("GetExamCodeOptions", "Plan")',
+                            type: 'GET',
+                            data: {}, // No specific room needed
+                            success: function (data) {
+                                $examCodeList.empty(); // Clear existing options
+                                $examCodeList.append($('<option></option>').val('').text('NULL'));
+
+                                $.each(data, function (i, option) {
+                                    $examCodeList.append($('<option></option>').val(option.value).text(option.text));
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching exam code options: ", error); // Log any errors
+                            }
+                        });
+                    }
+
+                    // Initial load for room and exam code options
+                    loadExamCodeOptions(); // Load all exam codes initially
+
+                    $('#startDateList').change(function () {
+                        currentStartDate = $(this).val();
+                        var $roomList = $('#roomList'); // Correct ID here
+
+                        $.ajax({
+                            url: '@Url.Action("GetRoomOptions", "Plan")',
+                            type: 'GET',
+                            data: { examCode: parseInt(currentExamCode), startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
+                            success: function (data) {
+                                $roomList.empty(); // Clear existing options
+
+                                $roomList.append($('<option></option>').val('').text('NULL'));
+
+                                $.each(data, function (i, option) {
+                                    $roomList.append($('<option></option>').val(option.value).text(option.text));
+                                });
+                                if(currentRoom == null)
+                                    $roomList.val('');
+                                else
+                                    $roomList.val(currentRoom);
+
+                            var $examCodeList = $('#examCodeList'); // Correct ID here
+
+                            $.ajax({
+                                url: '@Url.Action("GetExamCodeOptions", "Plan")',
+                                type: 'GET',
+                                data: { room: currentRoom , startDate: currentStartDate, endDate: currentEndDate },
+                                success: function (data) {
+                                    $examCodeList.empty(); // Clear existing options
+
+                                    $examCodeList.append($('<option></option>').val('').text('NULL'));
+
+                                    $.each(data, function (i, option) {
+                                        $examCodeList.append($('<option></option>').val(option.value).text(option.text));
+                                    });
+                                    if(currentExamCode == null)
+                                        $examCodeList.val('');
+                                    else
+                                        $examCodeList.val(currentExamCode);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Error fetching exam code options: ", error); // Log any errors
+                                }
+                            });
+
+                            var $endDateList = $('#endDateList'); // Correct ID here
+
+                            $.ajax({
+                                url: '@Url.Action("GetEndDateOptions", "Plan")',
+                                type: 'GET',
+                                data: { examCode: currentExamCode, room: currentRoom , startDate: currentStartDate},
+                                success: function (data) {
+                                    $endDateList.empty(); // Clear existing options
+
+                                    $endDateList.append($('<option></option>').val('').text('NULL'));
+
+                                    $.each(data, function (i, option) {
+                                        $endDateList.append($('<option></option>').val(option.value).text(option.text));
+                                    });
+                                    if(currentEndDate == null)
+                                        $endDateList.val('');
+                                    else
+                                        $endDateList.val(currentEndDate);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Error fetching end date options: ", error); // Log any errors
+                                }
+                            });
+
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching start date options: ", error); // Log any errors
+                            }
+                        });
+                    });
+
+                    $('#endDateList').change(function () {
+                        currentEndDate = $(this).val();
+                        var $roomList = $('#roomList'); // Correct ID here
+
+                        $.ajax({
+                            url: '@Url.Action("GetRoomOptions", "Plan")',
+                            type: 'GET',
+                            data: { examCode: parseInt(currentExamCode), startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
+                            success: function (data) {
+                                $roomList.empty(); // Clear existing options
+
+                                $roomList.append($('<option></option>').val('').text('NULL'));
+
+                                $.each(data, function (i, option) {
+                                    $roomList.append($('<option></option>').val(option.value).text(option.text));
+                                });
+                                if(currentRoom == null)
+                                    $roomList.val('');
+                                else
+                                    $roomList.val(currentRoom);
+
+                            var $examCodeList = $('#examCodeList'); // Correct ID here
+
+                            $.ajax({
+                                url: '@Url.Action("GetExamCodeOptions", "Plan")',
+                                type: 'GET',
+                                data: { room: currentRoom , startDate: currentStartDate, endDate: currentEndDate },
+                                success: function (data) {
+                                    $examCodeList.empty(); // Clear existing options
+
+                                    $examCodeList.append($('<option></option>').val('').text('NULL'));
+
+                                    $.each(data, function (i, option) {
+                                        $examCodeList.append($('<option></option>').val(option.value).text(option.text));
+                                    });
+                                    if(currentExamCode == null)
+                                        $examCodeList.val('');
+                                    else
+                                        $examCodeList.val(currentExamCode);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Error fetching exam code options: ", error); // Log any errors
+                                }
+                            });
+
+                            var $startDateList = $('#startDateList'); // Correct ID here
+
+                            $.ajax({
+                                url: '@Url.Action("GetStartDateOptions", "Plan")',
+                                type: 'GET',
+                                data: { examCode: currentExamCode, room: currentRoom , endDate: currentEndDate },
+                                success: function (data) {
+                                    $startDateList.empty(); // Clear existing options
+
+                                    $startDateList.append($('<option></option>').val('').text('NULL'));
+
+                                    $.each(data, function (i, option) {
+                                        $startDateList.append($('<option></option>').val(option.value).text(option.text));
+                                    });
+                                    if(currentStartDate == null)
+                                        $startDateList.val('');
+                                    else
+                                        $startDateList.val(currentStartDate);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("Error fetching start date options: ", error); // Log any errors
+                                }
+                            });
+
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching end date options: ", error); // Log any errors
+                            }
+                        });
+                    });
+
+                    $('#examCodeList').change(function () {
+                        currentExamCode = $(this).val();
+                        var $roomList = $('#roomList'); // Correct ID here
+
+                        $.ajax({
+                            url: '@Url.Action("GetRoomOptions", "Plan")',
+                            type: 'GET',
+                            data: { examCode: parseInt(currentExamCode), startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
+                            success: function (data) {
+                                $roomList.empty(); // Clear existing options
+
+                                $roomList.append($('<option></option>').val('').text('NULL'));
+                                
+                                $.each(data, function (i, option) {
+                                    $roomList.append($('<option></option>').val(option.value).text(option.text));
+                                });
+                                if(currentRoom == null)
+                                    $roomList.val('');
+                                else
+                                    $roomList.val(currentRoom);
+
+                                var $startDateList = $('#startDateList'); // Correct ID here
+
+                                $.ajax({
+                                    url: '@Url.Action("GetStartDateOptions", "Plan")',
+                                    type: 'GET',
+                                    data: { examCode: currentExamCode, room: currentRoom , endDate: currentEndDate },
+                                    success: function (data) {
+                                        $startDateList.empty(); // Clear existing options
+
+                                        $startDateList.append($('<option></option>').val('').text('NULL'));
+
+                                        $.each(data, function (i, option) {
+                                            $startDateList.append($('<option></option>').val(option.value).text(option.text));
+                                        });
+                                        if(currentStartDate == null)
+                                            $startDateList.val('');
+                                        else
+                                            $startDateList.val(currentStartDate);
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error("Error fetching start date options: ", error); // Log any errors
+                                    }
+                                });
+
+                                var $endDateList = $('#endDateList'); // Correct ID here
+
+                                $.ajax({
+                                    url: '@Url.Action("GetEndDateOptions", "Plan")',
+                                    type: 'GET',
+                                    data: { examCode: currentExamCode, room: currentRoom , startDate: currentStartDate},
+                                    success: function (data) {
+                                        $endDateList.empty(); // Clear existing options
+
+                                        $endDateList.append($('<option></option>').val('').text('NULL'));
+
+                                        $.each(data, function (i, option) {
+                                            $endDateList.append($('<option></option>').val(option.value).text(option.text));
+                                        });
+                                        if(currentEndDate == null)
+                                            $endDateList.val('');
+                                        else
+                                            $endDateList.val(currentEndDate);
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error("Error fetching end date options: ", error); // Log any errors
+                                    }
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching room options: ", error); // Log any errors
+                            }
+                        });
+                    });
+
+                    $('#roomList').change(function () {
+                        currentRoom = $(this).val();
+                        var $examCodeList = $('#examCodeList'); // Correct ID here
+
+                        $.ajax({
+                            url: '@Url.Action("GetExamCodeOptions", "Plan")',
+                            type: 'GET',
+                            data: { room: currentRoom, startDate: currentStartDate, endDate: currentEndDate },
+                            success: function (data) {
+                                $examCodeList.empty(); // Clear existing options
+
+                                $examCodeList.append($('<option></option>').val('').text('NULL'));
+
+                                $.each(data, function (i, option) {
+                                    $examCodeList.append($('<option></option>').val(option.value).text(option.text));
+                                });
+                                if(currentExamCode == null)
+                                    $examCodeList.val('');
+                                else
+                                    $examCodeList.val(currentExamCode);
+
+                                var $startDateList = $('#startDateList'); // Correct ID here
+
+                                $.ajax({
+                                    url: '@Url.Action("GetStartDateOptions", "Plan")',
+                                    type: 'GET',
+                                    data: { examCode: currentExamCode, room: currentRoom , endDate: currentEndDate },
+                                    success: function (data) {
+                                        $startDateList.empty(); // Clear existing options
+
+                                        $startDateList.append($('<option></option>').val('').text('NULL'));
+
+                                        $.each(data, function (i, option) {
+                                            $startDateList.append($('<option></option>').val(option.value).text(option.text));
+                                        });
+                                        if(currentStartDate == null)
+                                            $startDateList.val('');
+                                        else
+                                            $startDateList.val(currentStartDate);
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error("Error fetching start date options: ", error); // Log any errors
+                                    }
+                                });
+
+                                var $endDateList = $('#endDateList'); // Correct ID here
+
+                                $.ajax({
+                                    url: '@Url.Action("GetEndDateOptions", "Plan")',
+                                    type: 'GET',
+                                    data: { examCode: currentExamCode, room: currentRoom , startDate: currentStartDate},
+                                    success: function (data) {
+                                        $endDateList.empty(); // Clear existing options
+
+                                        $endDateList.append($('<option></option>').val('').text('NULL'));
+
+                                        $.each(data, function (i, option) {
+                                            $endDateList.append($('<option></option>').val(option.value).text(option.text));
+                                        });
+                                        if(currentEndDate == null)
+                                            $endDateList.val('');
+                                        else
+                                            $endDateList.val(currentEndDate);
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error("Error fetching end date options: ", error); // Log any errors
+                                    }
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error fetching exam code options: ", error); // Log any errors
+                            }
+                        });
+                    });
+                });
+        </script>
+        
+    }
+}
