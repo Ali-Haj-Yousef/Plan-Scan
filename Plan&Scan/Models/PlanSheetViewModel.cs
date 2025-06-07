@@ -9,7 +9,7 @@ namespace Plan_Scan.Models
     {
 
         [DisplayName("Exam Code")]
-        public int? ExamCode { get; set; }
+        public string? ExamCode { get; set; }
 
         public string? Room { get; set; }
 

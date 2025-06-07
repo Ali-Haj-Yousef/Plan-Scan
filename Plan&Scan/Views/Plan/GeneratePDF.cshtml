@@ -143,7 +143,7 @@
                         $.ajax({
                             url: '@Url.Action("GetRoomOptions", "Plan")',
                             type: 'GET',
-                            data: { examCode: parseInt(currentExamCode), startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
+                            data: { examCode: currentExamCode, startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
                             success: function (data) {
                                 $roomList.empty(); // Clear existing options
 
@@ -222,7 +222,7 @@
                         $.ajax({
                             url: '@Url.Action("GetRoomOptions", "Plan")',
                             type: 'GET',
-                            data: { examCode: parseInt(currentExamCode), startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
+                            data: { examCode: currentExamCode, startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
                             success: function (data) {
                                 $roomList.empty(); // Clear existing options
 
@@ -302,7 +302,7 @@
                         $.ajax({
                             url: '@Url.Action("GetRoomOptions", "Plan")',
                             type: 'GET',
-                            data: { examCode: parseInt(currentExamCode), startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
+                            data: { examCode: currentExamCode, startDate: currentStartDate, endDate: currentEndDate }, // Ensure it's sent as an integer
                             success: function (data) {
                                 $roomList.empty(); // Clear existing options
 

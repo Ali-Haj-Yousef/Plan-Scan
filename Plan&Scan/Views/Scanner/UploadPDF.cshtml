@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="card-body p-4">
-            <form method="post" enctype="multipart/form-data" asp-controller="Scanner" asp-action="Index">
+            <form method="post" enctype="multipart/form-data" asp-controller="Scanner" asp-action="UploadPDF">
                 <div class="row text-start">
                     <div class="form-floating py-2 col-12">
                         <input type="file" asp-for="File" class="form-control border-0 shadow" accept=".pdf"/>
@@ -18,7 +18,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-4">Scan</button>
+                <button type="submit" class="btn btn-primary mt-4">Upload</button>
             </form>
         </div>
     </div>

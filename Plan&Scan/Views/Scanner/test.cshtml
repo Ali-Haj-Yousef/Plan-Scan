@@ -1,0 +1,12 @@
+﻿@model List<List<string>>
+<table>
+    @foreach(var l in Model)
+    {
+        <tr>
+            @foreach(var t in l)
+            {
+                <td>@t</td>
+            }
+        </tr>
+    }
+</table>

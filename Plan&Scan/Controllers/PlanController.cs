@@ -1,13 +1,14 @@
-﻿using System.Diagnostics;
-using System.Reflection.Metadata;
-using iTextSharp.text;
+﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml.ConditionalFormatting;
 using Org.BouncyCastle.Utilities;
 using Plan_Scan.Data;
 using Plan_Scan.Models;
+using System.Diagnostics;
+using System.Reflection.Metadata;
 using Document = iTextSharp.text.Document;
 
 
@@ -116,7 +117,7 @@ namespace Plan_Scan.Controllers
             return header;
         }
 
-        private PdfPTable CreateIdentifiersHeader(String room, String course, int examCode)
+        private PdfPTable CreateIdentifiersHeader(String room, String course, string examCode)
         {
             string fontPath = Path.Combine("wwwroot", "fonts", "ocr-b-regular.ttf"); // Adjust the filename if necessary
 
@@ -298,14 +299,14 @@ namespace Plan_Scan.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetStartDateOptions(int? examCode, string? room, string? endDate)
+        public JsonResult GetStartDateOptions(string? examCode, string? room, string? endDate)
         {
             var query = _context.StudentExamRegistrations.AsQueryable();
 
             // Add condition for examCode
-            if (examCode.HasValue)
+            if (!string.IsNullOrEmpty(examCode))
             {
-                query = query.Where(x => x.ExamCode == examCode.Value);
+                query = query.Where(x => x.ExamCode == examCode);
             }
 
             // Add condition for room if it's provided
@@ -337,14 +338,14 @@ namespace Plan_Scan.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetEndDateOptions(int? examCode, string? room, string? startDate)
+        public JsonResult GetEndDateOptions(string? examCode, string? room, string? startDate)
         {
             var query = _context.StudentExamRegistrations.AsQueryable();
 
             // Add condition for examCode
-            if (examCode.HasValue)
+            if (!string.IsNullOrEmpty(room))
             {
-                query = query.Where(x => x.ExamCode == examCode.Value);
+                query = query.Where(x => x.ExamCode == examCode);
             }
 
             // Add condition for room if it's provided
@@ -376,14 +377,14 @@ namespace Plan_Scan.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetRoomOptions(int? examCode, string? startDate, string? endDate)
+        public JsonResult GetRoomOptions(string? examCode, string? startDate, string? endDate)
         {
             var query = _context.StudentExamRegistrations.AsQueryable();
 
             // Add condition for examCode
-            if (examCode.HasValue)
+            if (!string.IsNullOrEmpty(examCode))
             {
-                query = query.Where(x => x.ExamCode == examCode.Value);
+                query = query.Where(x => x.ExamCode == examCode);
             }
 
             // Add condition for startDate if it's provided
@@ -500,7 +501,7 @@ namespace Plan_Scan.Controllers
 
             var examCodesInData = _context.StudentExamRegistrations.Select(r => r.ExamCode).Distinct().ToList();
 
-            if (planSheetViewModel.ExamCode != null && !examCodesInData.Contains((int)planSheetViewModel.ExamCode))
+            if (planSheetViewModel.ExamCode != null && !examCodesInData.Contains(planSheetViewModel.ExamCode))
                 ModelState.AddModelError("examCode", "This exam code doesn't exist.");
 
             if (!ModelState.IsValid)

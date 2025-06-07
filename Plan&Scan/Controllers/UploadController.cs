@@ -39,7 +39,7 @@ namespace Plan_Scan.Controllers
                         SeatNb = worksheet.Cells[row, 6].Text,
                         Date = DateOnly.Parse(worksheet.Cells[row, 7].Text),
                         Time = worksheet.Cells[row, 8].Text,
-                        ExamCode = int.Parse(worksheet.Cells[row, 9].Text),
+                        ExamCode = worksheet.Cells[row, 9].Text,
                         // Map other properties accordingly
                     };
                     registrations.Add(registration);
