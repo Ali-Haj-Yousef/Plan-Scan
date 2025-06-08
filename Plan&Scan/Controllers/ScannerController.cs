@@ -106,17 +106,14 @@ namespace Plan_Scan.Controllers
 
             int regRow = 1;
 
-            registrationsSheet.Cells[regRow, 1].Value = "ID";
-            registrationsSheet.Cells[regRow, 2].Value = "Name";
-            registrationsSheet.Cells[regRow, 3].Value = "Course";
-            registrationsSheet.Cells[regRow, 4].Value = "Lang";
-            registrationsSheet.Cells[regRow, 5].Value = "Room";
-            registrationsSheet.Cells[regRow, 6].Value = "SeatNb";
-            registrationsSheet.Cells[regRow, 7].Value = "Date";
-            registrationsSheet.Cells[regRow, 8].Value = "Time";
-            registrationsSheet.Cells[regRow, 9].Value = "CodeExamDay";
+            registrationsSheet.Cells[regRow, 1].Value = "Student ID";
+            registrationsSheet.Cells[regRow, 2].Value = "Course";
+            registrationsSheet.Cells[regRow, 3].Value = "Room";
+            registrationsSheet.Cells[regRow, 4].Value = "Date";
+            registrationsSheet.Cells[regRow, 5].Value = "Exam Code";
+            
 
-            for (int col = 1; col <= 9; col++)
+            for (int col = 1; col <= 5; col++)
             {
                 registrationsSheet.Cells[regRow, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 registrationsSheet.Cells[regRow, col].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
@@ -133,28 +130,14 @@ namespace Plan_Scan.Controllers
                 var examCode = presence[1];
                 var studentId = Convert.ToInt32(presence[4]);
 
-                // Async DB query with cancellation token
-                var reg = await _context.StudentExamRegistrations
-                    .Where(r =>
-                        r.Date == date &&
-                        r.Room == room &&
-                        r.Course == course &&
-                        r.ExamCode == examCode &&
-                        r.StudentId == studentId)
-                    .FirstOrDefaultAsync(cancellationToken);
-
+                registrationsSheet.Cells[regRow, 1].Value = studentId;
+                registrationsSheet.Cells[regRow, 2].Value = course;
+                registrationsSheet.Cells[regRow, 3].Value = room;
+                registrationsSheet.Cells[regRow, 4].Value = date;
+                registrationsSheet.Cells[regRow, 5].Value = examCode;
                 
-                registrationsSheet.Cells[regRow, 1].Value = reg.StudentId;
-                registrationsSheet.Cells[regRow, 2].Value = reg.Name;
-                registrationsSheet.Cells[regRow, 3].Value = reg.Course;
-                registrationsSheet.Cells[regRow, 4].Value = reg.Lang.ToString();
-                registrationsSheet.Cells[regRow, 5].Value = reg.Room;
-                registrationsSheet.Cells[regRow, 6].Value = reg.SeatNb;
-                registrationsSheet.Cells[regRow, 7].Value = reg.Date;
-                registrationsSheet.Cells[regRow, 8].Value = reg.Time;
-                registrationsSheet.Cells[regRow, 9].Value = reg.ExamCode;
                 regRow++;
-               
+                    
             }
 
             var stream = new MemoryStream();
