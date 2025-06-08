@@ -103,7 +103,7 @@ namespace Plan_Scan.Controllers
             header.AddCell(FS);
 
 
-            PdfPCell dateField = new PdfPCell(new Phrase(dateOnly.ToString() + " - " + time, ocrbFont));
+            PdfPCell dateField = new PdfPCell(new Phrase(dateOnly.ToString("dd/MM/yyyy") + " - " + time, ocrbFont));
             dateField.Border = PdfPCell.NO_BORDER;
             dateField.HorizontalAlignment = Element.ALIGN_CENTER;
             header.AddCell(dateField);
